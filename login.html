@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login con Google</title>
+  <script type="module">
+    // Import SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+    import {
+      getAuth,
+      signInWithPopup,
+      GoogleAuthProvider,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    // Config Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBCnJyqG028uPFxHdaqjjvDZPBF8N5SkHY",
+      authDomain: "ddatawingmj.firebaseapp.com",
+      projectId: "ddatawingmj",
+      storageBucket: "ddatawingmj.firebasestorage.app",
+      messagingSenderId: "536819141999",
+      appId: "1:536819141999:web:cd84a0a9e16bd6317a2c9a",
+      measurementId: "G-JL4JLMBDP0"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    const loginButton = document.getElementById("login-button");
+    const logoutButton = document.getElementById("logout-button");
+    const userInfo = document.getElementById("user-info");
+
+    loginButton.addEventListener("click", async () => {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        alert("Errore nel login: " + error.message);
+      }
+    });
+
+    logoutButton.addEventListener("click", async () => {
+      await signOut(auth);
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        userInfo.innerHTML = `
+          <img src="${user.photoURL}" alt="Avatar" width="80" style="border-radius: 50%; margin-bottom: 10px;" />
+          <p><strong>${user.displayName}</strong></p>
+          <p>${user.email}</p>
+        `;
+        loginButton.style.display = "none";
+        logoutButton.style.display = "inline-block";
+      } else {
+        userInfo.innerHTML = "";
+        loginButton.style.display = "inline-block";
+        logoutButton.style.display = "none";
+      }
+    });
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 300px;
+    }
+    button {
+      background-color: #4285F4;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button:hover {
+      background-color: #3367d6;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Accedi con Google</h2>
+    <div id="user-info"></div>
+    <button id="login-button">Login con Google</button>
+    <button id="logout-button" style="display:none;">Logout</button>
+  </div>
+</body>
+</html>
